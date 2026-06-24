@@ -128,7 +128,7 @@ jobs:
           push: true
 
       - if: github.event_name == 'release'
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
 
