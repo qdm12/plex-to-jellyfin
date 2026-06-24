@@ -3,7 +3,6 @@
 CLI and web UI tool to migrate Plex watch states (watched, unwatched, partially watched) to Jellyfin for a target Plex and Jellyfin user. Not vibe coded.
 
 ![Last release](https://img.shields.io/github/release/qdm12/plex-to-jellyfin?label=Last%20release)
-![Last Docker tag](https://img.shields.io/docker/v/qmcgaw/plex-to-jellyfin?sort=semver&label=Last%20Docker%20tag)
 ![GitHub last release date](https://img.shields.io/github/release-date/qdm12/plex-to-jellyfin?label=Last%20release%20date)
 ![Commits since release](https://img.shields.io/github/commits-since/qdm12/plex-to-jellyfin/latest?sort=semver)
 
