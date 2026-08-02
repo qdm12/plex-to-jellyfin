@@ -208,7 +208,7 @@ var getPlexTokenTemplate = template.Must(template.New("get-plex-token").Parse(`<
   <h2>Step 2: Get Plex token</h2>
   <p>Sign in with the Plex user credentials to retrieve the Plex token.</p>
   {{if .ErrorMessage}}<div class="error">{{.ErrorMessage}}</div>{{end}}
-  <form hx-post="/step/get-plex-token/fetch" hx-target="#wizard" hx-swap="innerHTML">
+  <form hx-post="/step/get-plex-token/fetch" hx-target="#wizard" hx-swap="innerHTML" enctype="multipart/form-data">
     <div class="row">
       <label for="plex-username">Plex username or email</label>
       <input id="plex-username" name="plex_username" value="{{.PlexUsername}}" required>

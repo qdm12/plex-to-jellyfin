@@ -72,7 +72,7 @@ func (u *UI) handleGetPlexTokenFetch(responseWriter http.ResponseWriter, request
 	const maxFormSizeBytes = 1024 * 1024
 	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxFormSizeBytes)
 
-	err := request.ParseForm()
+	err := request.ParseMultipartForm(maxFormSizeBytes)
 	if err != nil {
 		http.Error(responseWriter, fmt.Sprintf("parsing form: %s", err), http.StatusBadRequest)
 		return
