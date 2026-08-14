@@ -25,16 +25,24 @@ type Migrator struct {
 func New(plex PlexClient, jellyfin JellyfinClient, logger Logger,
 	jellyfinUser string, libraries []string, dryRun bool,
 ) *Migrator {
-	slices.Sort(libraries)
-	libraries = slices.Compact(libraries)
 	return &Migrator{
 		plexClient:     plex,
 		jellyfinClient: jellyfin,
 		logger:         logger,
 		jellyfinUser:   jellyfinUser,
-		libraries:      libraries,
+		libraries:      normalizeLibraryNames(libraries),
 		dryRun:         dryRun,
 	}
+}
+
+func normalizeLibraryNames(libraries []string) []string {
+	normalizedLibraries := make([]string, len(libraries))
+	for i, library := range libraries {
+		normalizedLibraries[i] = strings.ToLower(strings.TrimSpace(library))
+	}
+	slices.Sort(normalizedLibraries)
+	normalizedLibraries = slices.Compact(normalizedLibraries)
+	return normalizedLibraries
 }
 
 func (m Migrator) Run(ctx context.Context) error {
@@ -97,10 +105,11 @@ func (m Migrator) fetchPlexData(ctx context.Context) (items []plex.Item, err err
 	}
 
 	for _, section := range sections {
+		normalizedSectionTitle := strings.ToLower(section.Title)
 		switch {
-		case len(m.libraries) > 0 && !slices.Contains(m.libraries, strings.ToLower(section.Title)):
-			m.logger.Infof("skipping Plex section %q because it is not in the list of libraries to migrate",
-				section.Title)
+		case len(m.libraries) > 0 && !slices.Contains(m.libraries, normalizedSectionTitle):
+			m.logger.Infof("skipping Plex section %q (normalized as %q) because it does not match configured libraries: %s",
+				section.Title, normalizedSectionTitle, strings.Join(m.libraries, ", "))
 			continue
 		case section.Type != "movie" && section.Type != "show":
 			m.logger.Warnf("skipping Plex section %q because its type %q is not supported",
