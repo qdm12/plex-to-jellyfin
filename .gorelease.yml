@@ -23,7 +23,8 @@ builds:
       - windows_386
       - windows_arm64
 archives:
-  - format: binary
+  - format_overrides:
+      - formats: ["binary"]
 checksum:
   name_template: "checksums.txt"
 snapshot:
