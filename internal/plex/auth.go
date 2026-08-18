@@ -3,10 +3,10 @@ package plex
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -14,17 +14,24 @@ import (
 func FetchToken(ctx context.Context, client *http.Client,
 	username, password, oneTimeCode string,
 ) (token string, err error) {
-	const url = "https://plex.tv/users/sign_in.json"
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
+	const signInURL = "https://plex.tv/api/v2/users/signin"
+
+	values := url.Values{}
+	values.Set("login", username)
+	values.Set("password", password)
+	values.Set("rememberMe", "true")
+	if oneTimeCode != "" {
+		values.Set("verificationCode", oneTimeCode)
+	}
+
+	requestBody := strings.NewReader(values.Encode())
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, signInURL, requestBody)
 	if err != nil {
 		return "", fmt.Errorf("creating request: %w", err)
 	}
 
-	request.SetBasicAuth(username, password)
 	setPlexHeaders(request.Header)
-	if oneTimeCode != "" {
-		request.Header.Set("X-Plex-Otp", oneTimeCode)
-	}
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response, err := client.Do(request)
 	if err != nil {
@@ -41,22 +48,24 @@ func FetchToken(ctx context.Context, client *http.Client,
 			response.StatusCode, responseBody)
 	}
 
-	decoder := json.NewDecoder(response.Body)
-	var body struct {
-		User struct {
-			AuthToken string `json:"authToken"`
-		} `json:"user"`
-	}
-	err = decoder.Decode(&body)
+	b, err := io.ReadAll(response.Body)
 	if err != nil {
-		return "", fmt.Errorf("decoding sign-in response: %w", err)
+		return "", fmt.Errorf("reading sign-in response: %w", err)
 	}
 
-	if body.User.AuthToken == "" {
-		return "", errors.New("parsing sign-in response: auth token is empty")
+	var body struct {
+		AuthToken string `json:"authToken"`
+	}
+	err = json.Unmarshal(b, &body)
+	if err != nil {
+		return "", fmt.Errorf("decoding sign-in response %s: %w", string(b), err)
 	}
 
-	return body.User.AuthToken, nil
+	if body.AuthToken == "" {
+		return "", fmt.Errorf("parsing sign-in response: auth token is empty in: %s", string(b))
+	}
+
+	return body.AuthToken, nil
 }
 
 func setPlexHeaders(headers http.Header) {
