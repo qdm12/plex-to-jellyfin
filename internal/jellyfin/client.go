@@ -147,7 +147,7 @@ func (c *Client) doJSON(ctx context.Context, method, address string, payload, re
 		return fmt.Errorf("creating request: %w", err)
 	}
 
-	request.Header.Set("X-Emby-Token", c.apiKey)
+	request.Header.Set("Authorization", `MediaBrowser Token="`+c.apiKey+`"`)
 	if payload != nil {
 		request.Header.Set("Content-Type", "application/json")
 	}
