@@ -82,7 +82,8 @@ func (m Migrator) Run(ctx context.Context) error {
 			continue
 		}
 
-		err = m.jellyfinClient.UpdateUserData(ctx, jellyfinUserID, jellyfinItem.ID, played, positionTicks)
+		err = m.jellyfinClient.UpdateUserData(ctx, jellyfinUserID, jellyfinItem.ID,
+			played, positionTicks, plexItem.PlayCount, plexItem.LastPlayed)
 		if err != nil {
 			return fmt.Errorf("updating %q (%s): %w", jellyfinItem.Name, jellyfinItem.ID, err)
 		}

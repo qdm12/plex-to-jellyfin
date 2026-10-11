@@ -11,6 +11,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Settings struct {
@@ -109,17 +110,23 @@ func (c *Client) FetchItems(ctx context.Context, userID string) (items []Item, e
 }
 
 func (c *Client) UpdateUserData(ctx context.Context, userID, itemID string,
-	played bool, positionTicks uint64,
+	played bool, positionTicks uint64, playCount uint, lastPlayed time.Time,
 ) error {
 	u := *c.baseURL
 	u.Path = path.Join(c.baseURL.Path, "/Users", userID, "Items", itemID, "UserData")
 
 	payload := struct {
-		Played                bool   `json:"Played"`
-		PlaybackPositionTicks uint64 `json:"PlaybackPositionTicks"`
+		Played                bool       `json:"Played"`
+		PlaybackPositionTicks uint64     `json:"PlaybackPositionTicks"`
+		PlayCount             uint       `json:"PlayCount"`
+		LastPlayedDate        *time.Time `json:"LastPlayedDate,omitempty"`
 	}{
 		Played:                played,
 		PlaybackPositionTicks: positionTicks,
+		PlayCount:             playCount,
+	}
+	if !lastPlayed.IsZero() {
+		payload.LastPlayedDate = &lastPlayed
 	}
 
 	err := c.doJSON(ctx, http.MethodPost, u.String(), payload, nil)
