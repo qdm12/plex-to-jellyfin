@@ -1,5 +1,7 @@
 package plex
 
+import "time"
+
 // WatchState indicates whether media is watched, unwatched, or partially watched.
 type WatchState string
 
@@ -22,5 +24,8 @@ type Item struct {
 	ProviderIDs   map[string]string
 	State         WatchState
 	PositionTicks uint64
-	Filepath      string
+	PlayCount     uint
+	// LastPlayed is the zero time if Plex has no last viewed date.
+	LastPlayed time.Time
+	Filepath   string
 }

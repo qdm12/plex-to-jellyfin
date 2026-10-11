@@ -63,12 +63,13 @@ func (c *Client) FetchSections(ctx context.Context) (sections []Section, err err
 }
 
 type xmlVideo struct {
-	Type       string `xml:"type,attr"`
-	Title      string `xml:"title,attr"`
-	ViewCount  uint   `xml:"viewCount,attr"`
-	ViewOffset uint64 `xml:"viewOffset,attr"`
-	GUID       string `xml:"guid,attr"`
-	Guids      []struct {
+	Type         string `xml:"type,attr"`
+	Title        string `xml:"title,attr"`
+	ViewCount    uint   `xml:"viewCount,attr"`
+	LastViewedAt uint64 `xml:"lastViewedAt,attr"`
+	ViewOffset   uint64 `xml:"viewOffset,attr"`
+	GUID         string `xml:"guid,attr"`
+	Guids        []struct {
 		ID string `xml:"id,attr"`
 	} `xml:"Guid"`
 	Media []struct {

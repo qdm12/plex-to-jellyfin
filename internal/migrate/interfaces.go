@@ -2,6 +2,7 @@ package migrate
 
 import (
 	"context"
+	"time"
 
 	"github.com/qdm12/plex-to-jellyfin/internal/jellyfin"
 	"github.com/qdm12/plex-to-jellyfin/internal/plex"
@@ -17,7 +18,7 @@ type JellyfinClient interface {
 	ResolveUserID(ctx context.Context, username string) (string, error)
 	FetchItems(ctx context.Context, userID string) ([]jellyfin.Item, error)
 	UpdateUserData(ctx context.Context, userID string, itemID string,
-		played bool, positionTicks uint64) error
+		played bool, positionTicks uint64, playCount uint, lastPlayed time.Time) error
 }
 
 type Logger interface {

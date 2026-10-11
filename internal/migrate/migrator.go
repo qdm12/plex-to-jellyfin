@@ -82,7 +82,8 @@ func (m Migrator) Run(ctx context.Context) error {
 			continue
 		}
 
-		err = m.jellyfinClient.UpdateUserData(ctx, jellyfinUserID, jellyfinItem.ID, played, positionTicks)
+		err = m.jellyfinClient.UpdateUserData(ctx, jellyfinUserID, jellyfinItem.ID,
+			played, positionTicks, plexItem.PlayCount, plexItem.LastPlayed)
 		if err != nil {
 			return fmt.Errorf("updating %q (%s): %w", jellyfinItem.Name, jellyfinItem.ID, err)
 		}
@@ -139,12 +140,13 @@ func (m Migrator) matchPlexToJellyfin(plexItem plex.Item, matcher itemMatcher, s
 			if len(ambiguousWarnings) > 0 || len(matches) > 1 {
 				stats.ambiguousJellyfinID++
 				for _, warning := range ambiguousWarnings {
-					m.logger.Warnf(warning)
+					m.logger.Warnf("%s", warning)
 				}
 			} else {
 				stats.noJellyfinMatch++
 			}
 			m.logger.Warnf("no Jellyfin match for Plex item %q", plexItem.Title)
+			return jellyfin.Item{}, false, 0, false
 		}
 		matches = []jellyfin.Item{match}
 	}
