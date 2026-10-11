@@ -139,12 +139,13 @@ func (m Migrator) matchPlexToJellyfin(plexItem plex.Item, matcher itemMatcher, s
 			if len(ambiguousWarnings) > 0 || len(matches) > 1 {
 				stats.ambiguousJellyfinID++
 				for _, warning := range ambiguousWarnings {
-					m.logger.Warnf(warning)
+					m.logger.Warnf("%s", warning)
 				}
 			} else {
 				stats.noJellyfinMatch++
 			}
 			m.logger.Warnf("no Jellyfin match for Plex item %q", plexItem.Title)
+			return jellyfin.Item{}, false, 0, false
 		}
 		matches = []jellyfin.Item{match}
 	}
