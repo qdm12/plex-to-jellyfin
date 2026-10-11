@@ -3,6 +3,7 @@ package plex
 import (
 	"strconv"
 	"strings"
+	"time"
 )
 
 func parseMetadata(metadata xmlVideo) (item Item, ok bool) {
@@ -19,6 +20,11 @@ func parseMetadata(metadata xmlVideo) (item Item, ok bool) {
 		state = WatchStatePartial
 		const ticksPerMillisecond = 10000
 		positionTicks = metadata.ViewOffset * ticksPerMillisecond
+	}
+
+	var lastPlayed time.Time
+	if metadata.LastViewedAt > 0 {
+		lastPlayed = time.Unix(int64(metadata.LastViewedAt), 0).UTC() //nolint:gosec
 	}
 
 	providerIDs := make(map[string]string, len(metadata.Guids)+1)
@@ -42,6 +48,8 @@ func parseMetadata(metadata xmlVideo) (item Item, ok bool) {
 		ProviderIDs:   providerIDs,
 		State:         state,
 		PositionTicks: positionTicks,
+		PlayCount:     metadata.ViewCount,
+		LastPlayed:    lastPlayed,
 		Filepath:      metadata.Media[0].Part.File,
 	}, true
 }
